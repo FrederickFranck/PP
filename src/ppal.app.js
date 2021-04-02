@@ -66,7 +66,6 @@ function updateScreen(){
   console.log(array)
 }
 
-
 function initServices() {
   NRF.setServices({
     //Custom Service For Punctuality Pal
