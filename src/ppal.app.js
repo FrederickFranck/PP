@@ -1,14 +1,29 @@
+require("FontDylex7x13").add(Graphics)
+
+var NextFerry = 0;
+
+
 function draw() {
-  g.clear();
+  g.reset();
+  g.setFont("FontDylex7x13",2)
   g.setFontAlign(0, 0); // center font
-  g.setFont("Vector", 20); // vector font, 80px  
+  //g.setFont("Vector", 20); // vector font, 80px  
   // draw the current counter value
-  g.drawString("Work in progress\n:)", 120, 120);
-  g.flip();
+  g.drawString("Next Ferry Departs At:", 50, 50);
+  g.drawString(NextFerry, 60 , 50);
+  
 
 
   Bangle.loadWidgets();
   Bangle.drawWidgets();
+
+}
+
+
+
+function updateFerry(buffer){
+
+
 
 }
 
@@ -58,14 +73,6 @@ function onGPS(fix) {
   }
 }
 
-function updateScreen(){
-  array = NRF.getAdvertisingData({
-    0x66FF : 0x0006
-  })
-
-  console.log(array)
-}
-
 function initServices() {
   NRF.setServices({
     //Custom Service For Punctuality Pal
@@ -98,10 +105,6 @@ function initServices() {
         writable: false,   // optional, default is false
         notify: true,   // optional, default is false
         description: "Speed",  // optional, default is null,
-
-        onWrite: function (evt) { // optional
-          console.log("Got ", evt.data); // an ArrayBuffer
-        }
       },
       0x0005: {
         value: "Ferry", // optional
@@ -116,7 +119,7 @@ function initServices() {
         }
       },
       0x0006: {
-        value: "1997-03-10T00:00:00.000Z", // optional
+        value: "00:00:00", // optional
         broadcast: true, // optional, default is false
         readable: true,   // optional, default is false
         writable: true,   // optional, default is false
@@ -124,7 +127,8 @@ function initServices() {
         description: "Time when next public transport leaves",  // optional, default is null,
 
         onWrite: function (evt) { // optional
-          console.log("Got ", evt.data); // an ArrayBuffer
+          //console.log("Got ", evt.data); // an ArrayBuffer
+          updateFerry(evt.data)
         }
       },
       0x0007: {
