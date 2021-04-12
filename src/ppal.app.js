@@ -1,17 +1,23 @@
 require("FontDylex7x13").add(Graphics);
 
 var NextFerry = 0;
-const X = 120, Y = 140;
+const X = 120, Y = 100;
 
 function draw() {
   g.reset();
-  g.setFont("Dylex7x13",2);
+  g.setFont("Dylex7x13", 2);
   g.setFontAlign(1, 1); // center font
   //g.setFont("Vector", 20); // vector font, 80px  
   // draw the current counter value
-  g.drawString("Next Ferry:", X, Y);
-  g.drawString(NextFerry, X+ 25 , Y , true);
-  
+  var d = new Date();
+  var h = d.getHours(), m = d.getMinutes();
+  var time = (" " + h).substr(-2) + ":" + ("0" + m).substr(-2);
+
+  g.drawString("Time :", X, Y)
+  g.drawString(time, X, Y, true)
+  g.drawString("Next Ferry:", X, Y + 80);
+  g.drawString(NextFerry, X + 25, Y + 80, true);
+
   Bangle.loadWidgets();
   Bangle.drawWidgets();
 
@@ -19,9 +25,14 @@ function draw() {
 
 
 
-function updateFerry(buffer){
-
-console.log(buffer);
+function updateFerry(buffer) {
+  ferrytime ="";
+  for (let x of buffer){
+    let c = String.fromCharCode(x);
+    ferrytime.concat(c);
+  }
+  NextFerry = ferrytime;
+  draw();  
 
 }
 function onGPS(fix) {
@@ -105,7 +116,7 @@ function initServices() {
         description: "Speed",  // optional, default is null,
 
         onWrite: function (evt) { // optional
-            E.showMessage("Got ", evt.data); // an ArrayBuffer
+          E.showMessage("Got ", evt.data); // an ArrayBuffer
         }
       },
       0x0005: {
@@ -158,7 +169,7 @@ function init() {
   draw();
   //var secondInterval = setInterval(draw, (1000*60));
   NextFerry = 1;
-  
+
 }
 
 
