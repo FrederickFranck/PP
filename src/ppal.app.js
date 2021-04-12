@@ -1,19 +1,17 @@
-require("FontDylex7x13").add(Graphics)
+require("FontDylex7x13").add(Graphics);
 
 var NextFerry = 0;
-
+const X = 120, Y = 140;
 
 function draw() {
   g.reset();
-  g.setFont("FontDylex7x13",2)
-  g.setFontAlign(0, 0); // center font
+  g.setFont("Dylex7x13",2);
+  g.setFontAlign(1, 1); // center font
   //g.setFont("Vector", 20); // vector font, 80px  
   // draw the current counter value
-  g.drawString("Next Ferry Departs At:", 50, 50);
-  g.drawString(NextFerry, 60 , 50);
+  g.drawString("Next Ferry:", X, Y);
+  g.drawString(NextFerry, X+ 25 , Y , true);
   
-
-
   Bangle.loadWidgets();
   Bangle.drawWidgets();
 
@@ -23,10 +21,9 @@ function draw() {
 
 function updateFerry(buffer){
 
-
+console.log(buffer);
 
 }
-
 function onGPS(fix) {
   hasfix = fix.fix;
   if (hasfix) {
@@ -73,38 +70,43 @@ function onGPS(fix) {
   }
 }
 
+
 function initServices() {
   NRF.setServices({
     //Custom Service For Punctuality Pal
     0x66FF: {
       0x0001: {
-        value: (55.000001).toString(), // optional
+        value: (51.174070).toString(), // optional
         readable: true,   // optional, default is false
         writable: false,   // optional, default is false
         notify: true,   // optional, default is false
         description: "latitude"  // optional, default is null,
       },
       0x0002: {
-        value: (66.000001).toString(), // optional
+        value: (4.380827).toString(), // optional
         readable: true,   // optional, default is false
         writable: false,   // optional, default is false
         notify: true,   // optional, default is false
         description: "longitude"  // optional, default is null,
       },
       0x0003: {
-        value: "1997-03-10T00:00:00.000Z", // optional
+        value: "1616162138000", // optional
         readable: true,   // optional, default is false
         writable: false,   // optional, default is false
         notify: true,   // optional, default is false
         description: "time"  // optional, default is null,
       },
       0x0004: {
-        value: 0.000000, // optional
+        value: "78178178", // optional
         broadcast: true, // optional, default is false
         readable: true,   // optional, default is false
-        writable: false,   // optional, default is false
+        writable: true,   // optional, default is false
         notify: true,   // optional, default is false
         description: "Speed",  // optional, default is null,
+
+        onWrite: function (evt) { // optional
+            E.showMessage("Got ", evt.data); // an ArrayBuffer
+        }
       },
       0x0005: {
         value: "Ferry", // optional
@@ -119,7 +121,7 @@ function initServices() {
         }
       },
       0x0006: {
-        value: "00:00:00", // optional
+        value: "16:15:00", // optional
         broadcast: true, // optional, default is false
         readable: true,   // optional, default is false
         writable: true,   // optional, default is false
@@ -127,12 +129,11 @@ function initServices() {
         description: "Time when next public transport leaves",  // optional, default is null,
 
         onWrite: function (evt) { // optional
-          //console.log("Got ", evt.data); // an ArrayBuffer
-          updateFerry(evt.data)
+          console.log("Got ", evt.data); // an ArrayBuffer
         }
       },
       0x0007: {
-        value: "1997-03-10T00:00:00.000Z", // optional
+        value: "16:00:00", // optional
         broadcast: true, // optional, default is false
         readable: true,   // optional, default is false
         writable: true,   // optional, default is false
@@ -150,19 +151,14 @@ function initServices() {
 }
 
 function init() {
+  g.clear();
   Bangle.setGPSPower(1);
   initServices();
   Bangle.on('GPS', onGPS);
   draw();
-
-  setWatch(() => {
-    Bangle.buzz();
-    E.showMessage("You\npressed\nthe middle\nbutton!");
-    setTimeout(()=>g.clear(), 1000);
-  }, BTN2, {repeat:true});
-
-
-
+  //var secondInterval = setInterval(draw, (1000*60));
+  NextFerry = 1;
+  
 }
 
 
