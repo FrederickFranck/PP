@@ -1,29 +1,38 @@
 require("FontDylex7x13").add(Graphics);
 
-var NextFerry = 0;
-const X = 120, Y = 100;
+var NextFerry = 2;
+const X = 0, Y = 80;
 
 function draw() {
   g.reset();
   g.setFont("Dylex7x13", 2);
-  g.setFontAlign(1, 1); // center font
   //g.setFont("Vector", 20); // vector font, 80px  
   // draw the current counter value
   var d = new Date();
   var h = d.getHours(), m = d.getMinutes();
   var time = (" " + h).substr(-2) + ":" + ("0" + m).substr(-2);
 
-  g.drawString("Time :", X, Y)
-  g.drawString(time, X, Y, true)
+  g.drawString("Time :", X, Y);
+  g.drawString(time, X +80 , Y, true);
   g.drawString("Next Ferry:", X, Y + 80);
-  g.drawString(NextFerry, X + 25, Y + 80, true);
+  g.drawString(NextFerry, X + 130, Y + 80, true);
 
   Bangle.loadWidgets();
   Bangle.drawWidgets();
 
 }
 
-
+function updateTime(){
+d = new Date();
+epoch = Math.round(d.getTime());
+NRF.updateServices({
+      0x66FF: {
+        0x0003: {
+          value: epoch.toString(),
+        }
+      }
+    });
+}
 
 function updateFerry(buffer) {
   ferrytime ="";
@@ -32,7 +41,6 @@ function updateFerry(buffer) {
     ferrytime.concat(c);
   }
   NextFerry = ferrytime;
-  draw();  
 
 }
 function onGPS(fix) {
@@ -116,7 +124,7 @@ function initServices() {
         description: "Speed",  // optional, default is null,
 
         onWrite: function (evt) { // optional
-          E.showMessage("Got ", evt.data); // an ArrayBuffer
+          E.showMessage("0004 ", evt.data); // an ArrayBuffer
         }
       },
       0x0005: {
@@ -128,7 +136,7 @@ function initServices() {
         description: "Description of next public transport",  // optional, default is null,
 
         onWrite: function (evt) { // optional
-          console.log("Got ", evt.data); // an ArrayBuffer
+          console.log("0005 ", evt.data); // an ArrayBuffer
         }
       },
       0x0006: {
@@ -140,7 +148,12 @@ function initServices() {
         description: "Time when next public transport leaves",  // optional, default is null,
 
         onWrite: function (evt) { // optional
-          console.log("Got ", evt.data); // an ArrayBuffer
+          NextFerry = "";
+          for(var i =0; i < evt.data.length; i++){
+            NextFerry += String.fromCharCode(evt.data[i]);
+          }          
+          draw();
+          //draw();
         }
       },
       0x0007: {
@@ -167,11 +180,10 @@ function init() {
   initServices();
   Bangle.on('GPS', onGPS);
   draw();
-  //var secondInterval = setInterval(draw, (1000*60));
-  NextFerry = 1;
-
+  var timestampInterval = setInterval(updateTime, 1000);
 }
 
 
 
 init();
+console.log("test");
