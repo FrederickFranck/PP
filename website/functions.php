@@ -15,7 +15,7 @@ date_default_timezone_set("Europe/Brussels");
 function calculate_position($latitude , $longitude){
     global $LAT_BAZEL_FERRY, $LAT_HEMIKSEM_FERRY;
     if($latitude < $LAT_BAZEL_FERRY and $latitude < $LAT_HEMIKSEM_FERRY){
-        //inbazel
+        //in bazel
         return 'ToHemiksem';
 
     }

@@ -50,9 +50,9 @@ function onGPS(fix) {
     let _lat = fix.lat.toFixed(round);
     let _long = fix.lon.toFixed(round);
     let _speed = fix.speed.toFixed(round);
-    Terminal.println("lat: " + _lat);
-    Terminal.println("long: " + _long);
-    Terminal.println("speed: " + _speed);
+    //Terminal.println("lat: " + _lat);
+    //Terminal.println("long: " + _long);
+    //Terminal.println("speed: " + _speed);
 
     NRF.updateServices({
       0x66FF: {
@@ -149,6 +149,7 @@ function initServices() {
 
         onWrite: function (evt) { // optional
           NextFerry = "";
+          Terminal.println(evt);
           for(var i =0; i < evt.data.length; i++){
             NextFerry += String.fromCharCode(evt.data[i]);
           }          
@@ -181,9 +182,15 @@ function init() {
   Bangle.on('GPS', onGPS);
   draw();
   var timestampInterval = setInterval(updateTime, 1000);
+  
+  
+  setWatch(() => {
+ draw();
+}, BTN2, {repeat:true});
+  
+  
 }
 
 
 
 init();
-console.log("test");
