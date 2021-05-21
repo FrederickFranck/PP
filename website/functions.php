@@ -1,11 +1,5 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-ob_start();
-
 'include dbconnect.php';
-
 
 $LAT_BAZEL_FERRY = 4.326043;
 $LAT_HEMIKSEM_FERRY = 4.330660;
@@ -37,7 +31,7 @@ function is_weekend($date){
 
 //SELECT `ToBazel` FROM `Ferry_Bazel_Weekend` WHERE `ToBazel` >= "15:45" LIMIT 1
 function get_next_ferry($lat, $long ,$epoch){
-    global $connection;
+    $connection = getConnection();
     $position = calculate_position($lat, $long);
     $epoch_f = substr($epoch, 0, 10);
     $dt = new DateTime("@$epoch_f");
@@ -59,7 +53,4 @@ function get_next_ferry($lat, $long ,$epoch){
 
     }
 }
-
-
-
 ?>
