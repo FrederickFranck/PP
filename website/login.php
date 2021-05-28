@@ -19,7 +19,7 @@
 
         <?php
         if(isset($_POST['login'])){
-            login($_POST['login'],$_POST['password']);
+            login($_POST['email'],$_POST['password']);
         }
         ?>
     </body>

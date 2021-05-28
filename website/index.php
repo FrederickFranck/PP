@@ -3,10 +3,11 @@ include 'menu.php';
 ?>
 <html>
     <head>
-        <title>Login</title>
+        <title>Home</title>
     </head>
-    <p1>Hallokes</p1>
+    
     <body>
+    <h1>Homepage Punctuality Pal</h1>
     </body>
 </hmtl>
 <?php

@@ -77,12 +77,17 @@ function login($email, $password){
         $result = $userDBconnection->query($sql);
         $row = $result->fetch_assoc();
         $access = $row['PP'];
-
+        
         //User has access to the project
         if($access){
             $sql = "INSERT INTO Users VALUES ('".$UserID."', '".$name."')";
             $_SESSION['ID'] = $UserID;
+            $_SESSION['name'] = $name;
+            echo "Logged in ! ";
+            header("Refresh:0");
+
             return true;
+
         }    
     }
     else{
