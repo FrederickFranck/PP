@@ -1,5 +1,6 @@
 <?php
-'include dbconnect.php';
+include 'dbconnect.php';
+include 'dbh.inc.php';
 
 $LAT_BAZEL_FERRY = 4.326043;
 $LAT_HEMIKSEM_FERRY = 4.330660;
@@ -50,7 +51,43 @@ function get_next_ferry($lat, $long ,$epoch){
         $result = $connection->query($sql);
         $row = $result->fetch_assoc();
         echo $row[$position];
+    }
+}
 
+
+function login($email, $password){
+    $userDBconnection = getConnectionUserDB();
+    $PPconnection = getConnection();
+
+    //Check if password is true
+    $sql = "SELECT ID, Firstname, email, `password` FROM Users WHERE '".$email."' = email";
+    $result = $userDBconnection->query($sql);
+    $row = $result->fetch_assoc();
+    $dbpassword = $row['password'];
+    $UserID = $row['ID'];
+    $name = $row['Firstname'];
+
+
+    $verify = hash('sha512', $password);
+    $verify = password_verify($verify, $dbpassword);
+
+    //check if user has access to project
+    if($verify){
+        $sql = "SELECT PP FROM ProjectAccess WHERE '".$UserID."' = UserID";
+        $result = $userDBconnection->query($sql);
+        $row = $result->fetch_assoc();
+        $access = $row['PP'];
+
+        //User has access to the project
+        if($access){
+            $sql = "INSERT INTO Users VALUES ('".$UserID."', '".$name."')";
+            $_SESSION['ID'] = $UserID;
+            return true;
+        }    
+    }
+    else{
+        echo "Incorrect Password";
+        return false;
     }
 }
 ?>

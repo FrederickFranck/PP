@@ -1,11 +1,9 @@
 <?php 
-
-include 'dbconnect.php';
-session_start();
+include 'menu.php';
 ?>
 <html>
     <head>
-        <title>Login </title>
+        <title>Login</title>
     </head>
     <p1>Hallokes</p1>
     <body>
