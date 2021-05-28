@@ -25,6 +25,7 @@ if(isset($_SESSION['name'])){
                 ?><a href="logout.php">Logout</a><?php
             }?>
             <a href="ferry.php">Ferry</a>
+            <a href="overview.php">View Data</a>
         </div>
     </body>
 </html>

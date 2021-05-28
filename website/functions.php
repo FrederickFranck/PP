@@ -54,6 +54,41 @@ function get_next_ferry($lat, $long ,$epoch){
     }
 }
 
+function get_users(){
+    $conn = getConnectionUserDB();
+    $sql = "SELECT UserID FROM ProjectAccess WHERE PP = 1";
+    $result = $conn->query($sql);
+    $i = 0;
+    
+    while($row = mysqli_fetch_assoc($result)){
+        $sql = "SELECT * FROM Users WHERE '".$row['UserID']."' = ID";
+        $sub_result = $conn->query($sql);  
+        $sub_row = mysqli_fetch_assoc($sub_result);
+        echo var_dump($sub_row);
+        $response[$i]['First name'] = $sub_row['Firstname'];
+        $response[$i]['Last name'] = $sub_row['Lastname'];
+        $response[$i]['E-mail'] = $sub_row['email'];
+        $response[$i]['UserID'] = $sub_row['ID'];
+        $i++;     
+    }
+    header("Content-Type: JSON");
+    echo json_encode($response,JSON_PRETTY_PRINT);
+}
+
+function get_location($userid){
+    $PPconnection = getConnection();
+    $sql = "SELECT `Long`, Lat, `Time` FROM History WHERE '".$userid."' = UserID";
+    $result = $PPconnection->query($sql);
+    $i = 0;
+    while($row = mysqli_fetch_assoc($result)){
+        $response[$i]['Longitude'] = $row['Long'];
+        $response[$i]['Latitude'] = $row['Lat'];
+        $response[$i]['Time'] = $row['Time'];
+        $i++;   
+
+    }
+}
+
 
 function login($email, $password){
     $userDBconnection = getConnectionUserDB();
@@ -73,18 +108,19 @@ function login($email, $password){
 
     //check if user has access to project
     if($verify){
-        $sql = "SELECT PP FROM ProjectAccess WHERE '".$UserID."' = UserID";
+        $sql = "SELECT PP, isAdmin FROM ProjectAccess WHERE '".$UserID."' = UserID";
         $result = $userDBconnection->query($sql);
         $row = $result->fetch_assoc();
         $access = $row['PP'];
+        $admin = $row['isAdmin'];
         
         //User has access to the project
         if($access){
             $sql = "INSERT INTO Users VALUES ('".$UserID."', '".$name."')";
             $_SESSION['ID'] = $UserID;
             $_SESSION['name'] = $name;
+            $_SESSION['isadmin'] = $admin;
             echo "Logged in ! ";
-            header("Refresh:0");
 
             return true;
 
