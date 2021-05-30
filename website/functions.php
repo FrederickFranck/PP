@@ -1,6 +1,7 @@
 <?php
 include 'dbconnect.php';
 include 'dbh.inc.php';
+//session_start();
 
 $LAT_BAZEL_FERRY = 4.326043;
 $LAT_HEMIKSEM_FERRY = 4.330660;
@@ -119,8 +120,9 @@ function login($email, $password){
             $sql = "INSERT INTO Users VALUES ('".$UserID."', '".$name."')";
             $_SESSION['ID'] = $UserID;
             $_SESSION['name'] = $name;
-            $_SESSION['isadmin'] = $admin;
+            $_SESSION['isAdmin'] = $admin;
             echo "Logged in ! ";
+            header( "refresh:2;url=http://pp.iotserver.xyz");
 
             return true;
 
@@ -131,4 +133,3 @@ function login($email, $password){
         return false;
     }
 }
-?>
