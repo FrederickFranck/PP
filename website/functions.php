@@ -27,20 +27,21 @@ function calculate_position($latitude , $longitude){
     }
 }
 
-function is_weekend($date){
-    return (date('N', $date) >= 6);
+function is_weekend(/*$date*/){
+    return (date('N') >= 6);
 }
 
 //SELECT `ToBazel` FROM `Ferry_Bazel_Weekend` WHERE `ToBazel` >= "15:45" LIMIT 1
-function get_next_ferry($lat, $long ,$epoch){
+function get_next_ferry($lat, $long /*,$epoch*/){
     $connection = getConnection();
     $position = calculate_position($lat, $long);
-    $epoch_f = substr($epoch, 0, 10);
-    $dt = new DateTime("@$epoch_f");
-    $time = $dt->format("H:i");
+    //$epoch_f = substr($epoch, 0, 10);
+    //$dt = new DateTime("@$epoch_f");
+    //$time = $dt->format("H:i");
+    $time = date("H:i");
     
-    if(is_weekend($epoch_f)){
-        echo "is weekend";
+    if(is_weekend(/*$epoch_f*/)){
+        echo "is weekend \r\n";
          $sql = "SELECT $position FROM Ferry_Bazel_Weekend WHERE $position >= '".$time."' LIMIT 1";
          $result = $connection->query($sql);
          $row = $result->fetch_assoc();
