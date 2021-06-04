@@ -1,7 +1,7 @@
 <?php
 include 'dbconnect.php';
 include 'dbh.inc.php';
-//session_start();
+
 
 $LAT_BAZEL_FERRY = 4.326043;
 $LAT_HEMIKSEM_FERRY = 4.330660;
