@@ -1,4 +1,8 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+ob_start();
 include 'dbconnect.php';
 include 'dbh.inc.php';
 
@@ -32,7 +36,7 @@ function is_weekend(/*$date*/){
 }
 
 //SELECT `ToBazel` FROM `Ferry_Bazel_Weekend` WHERE `ToBazel` >= "15:45" LIMIT 1
-function get_next_ferry($lat, $long /*,$epoch*/){
+function get_next_ferry($lat, $long ,$userid){
     $connection = getConnection();
     $position = calculate_position($lat, $long);
     //$epoch_f = substr($epoch, 0, 10);
@@ -53,6 +57,69 @@ function get_next_ferry($lat, $long /*,$epoch*/){
         $result = $connection->query($sql);
         $row = $result->fetch_assoc();
         echo $row[$position];
+    }
+    //insert into history 
+    $sql = "INSERT INTO History (UserID, `Long`, Lat) VALUES ('".$userid."', '".$long."', '".$lat."') ";
+    //echo $sql;
+    $connection->query($sql);
+
+
+    //CALCULATE ETA
+    $Call = "https://router.hereapi.com/v8/routes?transportMode=bicycle&origin=%s,%s&destination=%s,%s&apiKey=KvjD4uoJ2wSTgqYlpdxCz0dLucUs2aZqex6LOAAA71I";
+    if($position == 'ToBazel'){
+        //Veer hemiksem
+        $desLAT = "51.142462";
+        $desLONG = "4.325509";
+        
+
+    }
+    if($position == 'ToHemiksem'){
+        //Veer bazel
+        $desLAT = "51.143131";
+        $desLONG = "4.330986";
+
+    }
+    $Call = sprintf($Call,$lat,$long,$desLAT,$desLONG);
+    //echo $Call;
+    $json = file_get_contents($Call);
+    $json = json_decode($json,true);
+    $ETA = $json['routes'][0]['sections'][0]['arrival']['time'];
+    $ETA = explode("T",$ETA)[1];
+    $ETA = explode("+",$ETA)[0];
+    echo "T";
+    echo $ETA;
+
+}
+
+function get_userid($email,$pw){
+    $userDBconnection = getConnectionUserDB();
+    
+    //Check if password is true
+    $sql = "SELECT ID, Firstname, email, `password` FROM Users WHERE '".$email."' = email";
+    $result = $userDBconnection->query($sql);
+    $row = $result->fetch_assoc();
+    $dbpassword = $row['password'];
+    $UserID = $row['ID'];
+    $name = $row['Firstname'];
+
+
+    $verify = hash('sha512', $pw);
+    $verify = password_verify($verify, $dbpassword);
+
+    //check if user has access to project
+    if($verify){
+        $sql = "SELECT PP, isAdmin FROM ProjectAccess WHERE '".$UserID."' = UserID";
+        $result = $userDBconnection->query($sql);
+        $row = $result->fetch_assoc();
+        $access = $row['PP'];
+        
+        //User has access to the project
+        if($access){
+            echo $UserID ."$".$name;
+        }    
+    }
+    else{
+        echo "FECK OFF";
     }
 }
 
@@ -118,7 +185,8 @@ function login($email, $password){
         
         //User has access to the project
         if($access){
-            $sql = "INSERT INTO Users VALUES ('".$UserID."', '".$name."')";
+            $sql = "INSERT INTO Users VALUES ('".$UserID."')";
+            $PPconnection->query($sql);
             $_SESSION['ID'] = $UserID;
             $_SESSION['name'] = $name;
             $_SESSION['isAdmin'] = $admin;
